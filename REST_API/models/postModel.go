@@ -1,9 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Post struct{
 	gorm.Model
 	Title string
-	Body string
+	Description string
+	CreatedAt time.Time
 }

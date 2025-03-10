@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/restApi/controllers"
 	"github.com/restApi/initilizers"
 )
 func init(){
@@ -12,11 +13,7 @@ func init(){
 
 func main(){
 r:= gin.Default()
-r.GET("/",func(ctx *gin.Context) {
-	ctx.JSON(200,gin.H{
-		"message":"pong",
-	})
-})
+r.POST("/posts",controllers.CreatePost)
 r.Run()
 
 }
