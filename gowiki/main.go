@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -28,6 +27,6 @@ p1:=&Page{Title: "testPage",Body: []byte("This is a sample page.")}
 p1.save()
 p2:= loadPage("testPage")
 
-fmt.Println(string(p2.Body))
+log.Println(string(p2.Body))
 
 }
