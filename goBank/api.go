@@ -8,9 +8,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewApiServer(listenAddr string) *ApiServer {
+type ApiServer struct {
+	listenAddr string
+	store      Storage
+}
+
+func NewApiServer(listenAddr string, store Storage) *ApiServer {
 	return &ApiServer{
 		listenAddr: listenAddr,
+		store:      store,
 	}
 }
 func (s *ApiServer) Run() {
@@ -38,13 +44,21 @@ func (s *ApiServer) handleAccunts(w http.ResponseWriter, r *http.Request) error 
 
 }
 func (s *ApiServer) handleGetAccunts(w http.ResponseWriter, r *http.Request) error {
-	//id := mux.Vars(r)["id"]
-	//account := NewAccount("Amaan", "Mirza")
+
 	return writeJSON(w, http.StatusOK, &Account{})
 
 }
 func (s *ApiServer) handleCreateAccunts(w http.ResponseWriter, r *http.Request) error {
-	return nil
+
+	createAccountReq := new(CreateAccountRequest)
+	if err := json.NewDecoder(r.Body).Decode(&createAccountReq); err != nil {
+		return err
+	}
+	account := NewAccount(createAccountReq.FirstName, createAccountReq.LastName)
+	if err := s.store.CreateAccount(account); err != nil {
+		return err
+	}
+	return writeJSON(w, http.StatusOK, account)
 
 }
 func (s *ApiServer) handleDeleteAccunts(w http.ResponseWriter, r *http.Request) error {
@@ -57,14 +71,11 @@ func (s *ApiServer) handleTransfer(w http.ResponseWriter, r *http.Request) error
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
 
-type ApiServer struct {
-	listenAddr string
-}
 type apiFunc func(http.ResponseWriter, *http.Request) error
 
 type ApiError struct {
