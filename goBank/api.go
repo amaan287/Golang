@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -21,18 +22,17 @@ func NewApiServer(listenAddr string, store Storage) *ApiServer {
 }
 func (s *ApiServer) Run() {
 	router := mux.NewRouter()
-	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccunts))
-	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccunts))
-
+	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccounts))
+	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccountById))
 	fmt.Println("Server is running on http://localhost", s.listenAddr)
 	err := http.ListenAndServe(s.listenAddr, router)
 	if err != nil {
 		fmt.Println("Error", err)
 	}
 }
-func (s *ApiServer) handleAccunts(w http.ResponseWriter, r *http.Request) error {
+func (s *ApiServer) handleAccounts(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "GET" {
-		return s.handleGetAccunts(w, r)
+		return s.handleGetAccount(w, r)
 	}
 	if r.Method == "POST" {
 		return s.handleCreateAccunts(w, r)
@@ -43,9 +43,26 @@ func (s *ApiServer) handleAccunts(w http.ResponseWriter, r *http.Request) error 
 	return fmt.Errorf("method not allowed, your method: %s", r.Method)
 
 }
-func (s *ApiServer) handleGetAccunts(w http.ResponseWriter, r *http.Request) error {
+func (s *ApiServer) handleGetAccountById(w http.ResponseWriter, r *http.Request) error {
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return fmt.Errorf("invalid id given %s", idStr)
+	}
+	account, err := s.store.GetAccountbById(id)
+	if err != nil {
+		return err
+	}
+	return writeJSON(w, http.StatusOK, account)
 
-	return writeJSON(w, http.StatusOK, &Account{})
+}
+func (s *ApiServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
+	accounts, err := s.store.GetAccounts()
+	if err != nil {
+		return err
+
+	}
+	return writeJSON(w, http.StatusOK, accounts)
 
 }
 func (s *ApiServer) handleCreateAccunts(w http.ResponseWriter, r *http.Request) error {

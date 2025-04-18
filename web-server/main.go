@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	// Create a socket
+	//? Create a socket
 	serverFd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM, 0)
 	if err != nil {
 		fmt.Println("Socket error:", err)
