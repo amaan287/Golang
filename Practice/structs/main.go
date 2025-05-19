@@ -6,6 +6,7 @@ import (
 	"github.com/amaan287/Golang/Practice/structs/BankAccount"
 	book "github.com/amaan287/Golang/Practice/structs/Book"
 	employee "github.com/amaan287/Golang/Practice/structs/Employee"
+	linkedlist "github.com/amaan287/Golang/Practice/structs/LinkedList"
 	rect "github.com/amaan287/Golang/Practice/structs/Rectangle"
 	students "github.com/amaan287/Golang/Practice/structs/Students"
 )
@@ -26,6 +27,10 @@ func main() {
 	a.Deposit(20)
 	a.Withdraw(10)
 	e := employee.CreateEmployee("Amaan", 19000)
-	fmt.Print(e)
 	e.Raise()
+	l := linkedlist.LinkedList{}
+	l.InsertAtBack(2344)
+	l.InsertAtBack(22)
+	fmt.Printf("%d", l)
+
 }
